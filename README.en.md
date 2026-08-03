@@ -61,7 +61,7 @@ pip install -e ".[chroma]"        # core + Chroma adapter; core-only: pip instal
 > Chroma documents are written with explicit dummy embeddings, so the locate direction
 > **downloads no embedding model** — fully offline.
 
-<h2>Quickstart</h2>
+<h2><img src="https://api.iconify.design/tabler:bolt.svg?color=%230071E3&width=24" height="22" align="absmiddle" alt=""> Quickstart</h2>
 
 ```bash
 python examples/seed_demo.py /tmp/sp-demo                 # seed a 3-store fixture (7 residues)
@@ -164,7 +164,7 @@ The GIF is rendered from [`docs/demo.tape`](./docs/demo.tape) (a vhs script) by
 - [ ] **m3 audit proof**: ed25519 detached signature + 等保2.0 (MLPS 2.0) jinja2 report (CN-primary) + `verify` offline round-trip
 - [ ] **enterprise extension**: graph-store adapter (Neo4j / JanusGraph) + MLPS vendor console integration (绿盟 / 启明星辰) + multi-runtime federation + on-site deployment
 
-## Paid
+<h2><img src="https://api.iconify.design/tabler:credit-card.svg?color=%230071E3&width=24" height="22" align="absmiddle" alt=""> Paid</h2>
 
 The OSS core (3 adapters + CLI + residue_map + ed25519 verify) is free forever. **SubjectPurge
 itself is never cloud-hosted** — `data-not-out` (数据不出境) forbids a hosted SaaS by design. What

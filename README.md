@@ -55,7 +55,7 @@ pip install -e ".[chroma]"        # 核心 + Chroma 适配器；纯核心用 pip
 > 信创环境若访问 GitHub 受限，用 Gitee 镜像：`git clone https://gitee.com/SuperMarioYL/subjectpurge`。
 > Chroma 文档以显式 dummy embedding 写入，定位方向**不下载任何 embedding 模型**，完全离线。
 
-<h2>快速开始</h2>
+<h2><img src="https://api.iconify.design/tabler:bolt.svg?color=%230071E3&width=24" height="22" align="absmiddle" alt=""> 快速开始</h2>
 
 ```bash
 python examples/seed_demo.py /tmp/sp-demo                 # 造一个 3-store fixture（7 处残留）
@@ -154,7 +154,7 @@ GIF 由 [`docs/demo.tape`](./docs/demo.tape)（vhs 脚本）经 `.github/workflo
 - [ ] **m3 审计证明**：ed25519 detached 签名 + 等保2.0 jinja2 报告（CN-primary）+ `verify` 离线往返
 - [ ] **企业扩展**：图存储适配器（Neo4j / JanusGraph）+ 等保厂商控制台集成（绿盟 / 启明星辰）+ 多运行时联邦 + 驻场部署
 
-## 付费
+<h2><img src="https://api.iconify.design/tabler:credit-card.svg?color=%230071E3&width=24" height="22" align="absmiddle" alt=""> 付费</h2>
 
 OSS 核心（3 适配器 + CLI + residue_map + ed25519 验证）永久免费。**清痕本身从不被云托管**——
 `数据不出境` 从架构上禁止了云托管 SaaS。付费的是按组织（per-org，非 per-seat）的**企业扩展许可证**：

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """Print a one-hit summary of a residue_map.json (demo helper)."""
+
 from __future__ import annotations
 
 import json

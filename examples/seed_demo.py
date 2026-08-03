@@ -128,7 +128,9 @@ def main(root: str) -> None:
             {"id": "vec_index", "kind": "chroma", "path": str(chroma_dir), "collection": "sessions"}
         )
     (root_path / "stores.yaml").write_text(
-        yaml.safe_dump({"operator": "sre-alice", "law_ref": "PIPL-47", "stores": stores}, allow_unicode=True),
+        yaml.safe_dump(
+            {"operator": "sre-alice", "law_ref": "PIPL-47", "stores": stores}, allow_unicode=True
+        ),
         encoding="utf-8",
     )
     print(f"seeded fixture at {root_path}")
@@ -136,7 +138,9 @@ def main(root: str) -> None:
     print(f"  trace  : {trace_dir}  (2 residues)")
     if chroma_live:
         print(f"  chroma : {chroma_dir}  (2 residues)")
-    print(f"  total  : {7 if chroma_live else 5} residues across {3 if chroma_live else 2} store(s)")
+    print(
+        f"  total  : {7 if chroma_live else 5} residues across {3 if chroma_live else 2} store(s)"
+    )
     print(f"  config : {root_path / 'stores.yaml'}")
 
 
