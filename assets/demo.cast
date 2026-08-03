@@ -1,0 +1,13 @@
+{"version": 2, "width": 100, "height": 34, "timestamp": 1785748319, "title": "reverse-delete on seeded 3-store fixture (<30s)", "env": {"SHELL": "/bin/bash", "TERM": "xterm-256color"}}
+[0.4, "o", "$ python examples/seed_demo.py /tmp/sp-demo-cast\n"]
+[0.75, "o", "seeded fixture at /tmp/sp-demo-cast\n  sqlite : /tmp/sp-demo-cast/claude-mem.db  (3 residues)\n  trace  : /tmp/sp-demo-cast/trace  (2 residues)\n  chroma : /tmp/sp-demo-cast/chroma  (2 residues)\n  total  : 7 residues across 3 store(s)\n  config : /tmp/sp-demo-cast/stores.yaml\n"]
+[3.65, "o", "$ subjectpurge scan --subject 13800138000 --config /tmp/sp-demo-cast/stores.yaml --out /tmp/sp-demo-cast/residue_map.json\n"]
+[4.0, "o", "scanned subject=13800138000 across 3 store(s), operator=sre-alice\nscan complete: subject=13800138000\n  total residue hits: 7\n  claude_mem: 3 hit(s)\n  trace_logs: 2 hit(s)\n  vec_index: 2 hit(s)\n  residue_kind=direct_pii: 1\n  residue_kind=embedded: 3\n  residue_kind=summarized: 1\n  residue_kind=trace_ref: 2\n  residue map -> /tmp/sp-demo-cast/residue_map.json\n"]
+[6.7, "o", "$ python examples/show_map.py /tmp/sp-demo-cast/residue_map.json\n"]
+[7.05, "o", "{\n  \"subject_id\": \"13800138000\",\n  \"total\": 7,\n  \"first_hit\": {\n    \"store_id\": \"claude_mem\",\n    \"adapter\": \"sqlite\",\n    \"locator\": \"memories:rowid=1:phone\",\n    \"residue_kind\": \"direct_pii\",\n    \"confidence\": 1.0,\n    \"evidence_hash\": \"a6942f9771d67f34034d2f1926988ed3fad3bf1b4e7cedb9a31f31398dea43bc\"\n  }\n}\n"]
+[8.35, "o", "$ subjectpurge purge --subject 13800138000 --config /tmp/sp-demo-cast/stores.yaml --confirm\n"]
+[8.7, "o", "[purge] not in this build\n  purge is the m2 milestone (per-hit deletion + append-only hash-chained lineage.jsonl with prior_hash/self_hash + before/after counts). Not implemented in this m1 build.\n"]
+[10.0, "o", "$ subjectpurge audit --subject 13800138000\n"]
+[10.35, "o", "[audit] not in this build\n  audit is the m3 milestone (ed25519 detached signature + \u7b49\u4fdd2.0 jinja2 report + runtime_env_hash binding + offline verify round-trip). Not implemented in this m1 build.\n"]
+[11.65, "o", "$ subjectpurge verify audit_proof.json\n"]
+[12.0, "o", "[verify] not in this build\n  verify is the m3 milestone (ed25519 signature check + \u7b49\u4fdd2.0 report consistency, offline round-trip). Not implemented in this m1 build.\n"]
