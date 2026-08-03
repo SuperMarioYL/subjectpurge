@@ -39,8 +39,6 @@ Thumbs.db
 /tmp/sp-demo*
 
 # --- assistant / agent tooling (never shipped) ---
-.claude/
-CLAUDE.md
 
 # --- build scratch + control files (pipeline artifacts, not for the repo) ---
 PUBLISH_BLOCKED.md
