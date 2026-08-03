@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "name": "subjectpurge",
+  "github": "https://github.com/SuperMarioYL/subjectpurge",
+  "host": "subjectpurge.lei6393.com",
+  "lang": { "primary": "zh", "toggle": true },
+  "accent": ["#e6a144", "#d97757", "#92400e"],
+  "hero": {
+    "eyebrow": { "zh": "本地 · 不出境 · 一条命令", "en": "On-prem · No cloud · One command" },
+    "headline": {
+      "zh": "删除请求来了\n先看清 PII 散落在哪",
+      "en": "A deletion request landed.\nSee where the PII is scattered first"
+    },
+    "sub": {
+      "zh": "给一个主体标识，30 秒内定位它在 agent 记忆图、向量索引、压缩轨迹里的全部 PII 残留——跨异构存储的反向索引，全程数据不出境。",
+      "en": "Hand it a subject ID; in 30 seconds locate every PII residue across your agent memory graph, vector index, and compressed traces — a reverse index across heterogeneous stores, fully on-prem."
+    },
+    "command": "subjectpurge scan --subject 13800138000",
+    "cta": { "zh": "为什么", "en": "Why" },
+    "ctaGithub": { "zh": "源码", "en": "Source" },
+    "scroll": { "zh": "往下看", "en": "Scroll" }
+  },
+  "advantages": [
+    {
+      "title": { "zh": "一条命令，定位全部残留", "en": "One command, every residue located" },
+      "body": {
+        "zh": "给个手机号、身份证号或邮箱，扇出到 SQLite、向量索引、压缩轨迹三类存储，把某人的 PII 在 agent 记忆里的藏身处一次找全，写入 residue_map.json。",
+        "en": "Give a phone, ID, or email; it fans out to SQLite, vector index, and compressed traces to find every place someone's PII hides in agent memory, writing residue_map.json."
+      },
+      "chips": ["› SQLite / 向量 / 轨迹", "› residue_map.json", "› 30 秒"]
+    },
+    {
+      "title": { "zh": "数据不出境", "en": "Data never leaves your boundary" },
+      "body": {
+        "zh": "单进程、本地存储、离线运行。定位方向不下载任何 embedding 模型——合规证明不建立在模型之上。",
+        "en": "Single process, local stores, offline. The locate direction downloads no embedding model — compliance proof can't rest on a model."
+      },
+      "chips": ["› 本地单进程", "› 离线", "› 无 embedding 下载"]
+    },
+    {
+      "title": { "zh": "补上 recall 到 delete 的反向索引", "en": "The reverse recall→delete index" },
+      "body": {
+        "zh": "现有的记忆工具擅长 ingest 到 recall，没人拥有反向定位。清痕补这一段：从主体标识出发，跨异构存储找到全部 PII 残留——为个保法删除请求而生。",
+        "en": "Today's memory tools own ingest→recall; nobody owns the reverse. SubjectPurge closes the gap: from a subject ID, locate every PII residue across heterogeneous stores — built for PIPL deletion requests."
+      },
+      "chips": ["› 反向索引", "› 跨 3 类存储", "› 个保法第四十七条"]
+    }
+  ],
+  "scene": { "kind": "hub-nodes", "nodes": ["SQLite", "向量索引", "压缩轨迹", "residue_map.json"] },
+  "cta": {
+    "headline": { "zh": "删除请求不该靠猜", "en": "A deletion request shouldn't be a guessing game" },
+    "sub": {
+      "zh": "先定位全部残留，剩下的留给你的删除流程。本地、不出境、一条命令。",
+      "en": "Locate every residue first, then run your deletion process. On-prem, no cloud, one command."
+    },
+    "button": { "zh": "GitHub 源码", "en": "Source on GitHub" }
+  },
+  "footer": { "tag": { "zh": "清痕 — per-subject 删除溯源器", "en": "SubjectPurge — per-subject deletion-lineage mapper" } }
+}
