@@ -1,0 +1,78 @@
+{
+  "name": "subjectpurge",
+  "tagline": "Find a subject identifier across your configured stores.",
+  "architecture": {
+    "title": "How SubjectPurge works",
+    "nodes": [
+      {
+        "title": "Store registry",
+        "detail": "subjectpurge/config.py"
+      },
+      {
+        "title": "Read adapters",
+        "detail": "SQLite / trace / optional Chroma"
+      },
+      {
+        "title": "Subject scanner",
+        "detail": "subjectpurge/scanner.py"
+      },
+      {
+        "title": "ResidueMap",
+        "detail": "Matched locations and hashes"
+      }
+    ],
+    "edges": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        2,
+        3
+      ]
+    ]
+  },
+  "process": {
+    "title": "From input to a useful result",
+    "steps": [
+      {
+        "title": "Register stores",
+        "detail": "Temporary SQLite and trace"
+      },
+      {
+        "title": "Locate subject",
+        "detail": "Reserved example email"
+      },
+      {
+        "title": "Collect map",
+        "detail": "Two stores, no deletion"
+      }
+    ],
+    "result": "The subject is located in both stores while the SQLite row count remains unchanged."
+  },
+  "integrations": {
+    "title": "Supported input and output routes",
+    "items": [
+      {
+        "title": "SQLite",
+        "detail": "Configured text columns"
+      },
+      {
+        "title": "Trace text",
+        "detail": "Configured local glob"
+      },
+      {
+        "title": "Chroma optional extra",
+        "detail": "Stored document matching"
+      },
+      {
+        "title": "Residue JSON",
+        "detail": "Location map for review"
+      }
+    ]
+  }
+}

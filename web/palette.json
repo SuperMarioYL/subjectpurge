@@ -1,0 +1,38 @@
+{
+  "mode": "auto",
+  "id": "56b8e6-6a7de7-acf6f2-8bc3e1930483",
+  "identity": "https://github.com/supermarioyl/subjectpurge",
+  "primary": "#56b8e6",
+  "secondary": "#6a7de7",
+  "highlight": "#acf6f2",
+  "dark": {
+    "bg": "#050a12",
+    "panel": "#0c151f",
+    "code": "#0a131d",
+    "ink": "#eefdfc",
+    "muted": "#95b0c4",
+    "line": "#173041",
+    "primary": "#56b8e6",
+    "secondary": "#6a7de7",
+    "highlight": "#acf6f2",
+    "accent": "#56b8e6",
+    "buttonStart": "#3b7e9e",
+    "buttonEnd": "#5f6fce",
+    "buttonText": "#ffffff"
+  },
+  "light": {
+    "bg": "#f9fdfe",
+    "panel": "#f7fbfe",
+    "code": "#f3fafd",
+    "ink": "#132330",
+    "muted": "#557288",
+    "line": "#cbeaf7",
+    "primary": "#397a99",
+    "secondary": "#5b6cc7",
+    "highlight": "#557978",
+    "accent": "#397a99",
+    "buttonStart": "#3b7e9e",
+    "buttonEnd": "#5f6fce",
+    "buttonText": "#ffffff"
+  }
+}

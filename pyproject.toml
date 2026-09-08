@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "subjectpurge"
 version = "0.1.0"
-description = "清痕 — per-subject deletion-lineage mapper across agent-memory stores (SQLite / Chroma / trace) with 等保2.0 audit proof. 数据不出境."
+description = "Locate exact subject identifiers across configured SQLite, text-trace and optional Chroma stores and export a residue map."
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]

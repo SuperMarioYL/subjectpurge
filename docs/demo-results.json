@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "source_revision": "7ca4da873eadf30813e47ad80e4e2aaa6043ba9d",
+  "scope": "Read-only matching of a reserved example email in temporary SQLite and text stores; no personal data, Chroma scan, deletion or audit proof.",
+  "steps": [
+    {
+      "label": "Recorded run",
+      "body": "Read-only matching of a reserved example email in temporary SQLite and text stores; no personal data, Chroma scan, deletion or audit proof.",
+      "command": ".venv/bin/python examples/presentation-demo.py",
+      "output": "{\n  \"subject\": \"demo@example.com\",\n  \"hits\": [\n    {\n      \"store\": \"notes\",\n      \"adapter\": \"sqlite\",\n      \"kind\": \"embedded\"\n    },\n    {\n      \"store\": \"traces\",\n      \"adapter\": \"trace_text\",\n      \"kind\": \"trace_ref\"\n    }\n  ]\n}\ndatabase rows after scan: 2"
+    }
+  ]
+}
