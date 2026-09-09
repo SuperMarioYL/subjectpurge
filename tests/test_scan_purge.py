@@ -10,6 +10,7 @@ covered; the Chroma tests skip when the optional extra is absent.
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -195,7 +196,11 @@ def test_cli_purge_stub_exits_nonzero(three_store_fixture):
 def test_cli_scan_help_lists_subject_option():
     result = runner.invoke(app, ["scan", "--help"])
     assert result.exit_code == 0
-    assert "--subject" in result.output
+    # CI runners force ANSI styling into the captured help, where typer renders
+    # the option as "-" + "-subject" in separate style runs — assert on the
+    # plain text, not the styling.
+    plain = re.sub(r"\x1b\[[0-9;]*[A-Za-z]", "", result.output)
+    assert "--subject" in plain
 
 
 # module-level import of the fixture subject so tests read cleanly
