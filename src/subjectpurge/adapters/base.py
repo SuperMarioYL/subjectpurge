@@ -17,6 +17,10 @@ class Adapter(ABC):
     """Reverse-direction agent-runtime store adapter."""
 
     kind: str = "base"
+    # StoreConfig fields every hit of this kind needs before the adapter can be
+    # constructed — build_adapter validates them so a malformed stores.yaml
+    # entry fails with the store id + field name, not a raw TypeError.
+    required_fields: tuple[str, ...] = ()
 
     def __init__(self, store_id: str, **opts: object) -> None:
         self.store_id = store_id

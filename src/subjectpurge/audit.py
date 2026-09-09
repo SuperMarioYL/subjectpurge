@@ -41,7 +41,12 @@ class AuditSigner:
         raise NotImplementedError(self.NOT_IMPLEMENTED_MSG)
 
 
-def audit(subject_id: str) -> AuditProof:
+def audit(
+    subject_id: str,
+    residue: str = "residue_map.json",
+    lineage: str = "lineage.jsonl",
+    out: str = "audit_proof.json",
+) -> AuditProof:
     """``subjectpurge audit`` entrypoint — m3, not in this build."""
     raise NotImplementedError(AuditSigner.NOT_IMPLEMENTED_MSG)
 

@@ -10,6 +10,7 @@ PII-pattern); no LLM is invoked.
 
 from __future__ import annotations
 
+import os
 import sqlite3
 from typing import Any
 
@@ -31,6 +32,11 @@ _DIRECT_PII_COLUMN_HINTS = (
     "ssn",
 )
 
+# Alias under which the implicit rowid is surfaced by the row select. `SELECT *`
+# never returns it, so without the alias tables lacking an explicit rowid column
+# would fall back to a non-unique first-column identity in their locators.
+_ROWID_ALIAS = "__sp_rowid__"
+
 
 def _is_direct_pii_column(column: str) -> bool:
     lc = column.lower()
@@ -41,6 +47,7 @@ class SQLiteAdapter(Adapter):
     """Reverse-locate a subject's PII residue in a SQLite agent-memory table."""
 
     kind = "sqlite"
+    required_fields = ("path",)
 
     def __init__(
         self,
@@ -58,6 +65,13 @@ class SQLiteAdapter(Adapter):
 
     def _connect(self) -> sqlite3.Connection:
         if self._conn is None:
+            # Fail loudly on a typo'd path: sqlite3.connect would silently
+            # create an empty database and the scan would report a false-clean
+            # 0-hit store.
+            if not os.path.exists(self.path):
+                raise FileNotFoundError(
+                    f"sqlite store {self.store_id!r}: no database file at {self.path!r}"
+                )
             self._conn = sqlite3.connect(self.path)
             self._conn.row_factory = sqlite3.Row
         return self._conn
@@ -70,10 +84,23 @@ class SQLiteAdapter(Adapter):
         except sqlite3.Error:
             return []
 
+    def _select_rows(self, conn: sqlite3.Connection) -> list[sqlite3.Row]:
+        # The rowid alias makes every locator resolvable to a true rowid even
+        # when the table has no explicit rowid column. WITHOUT-ROWID tables
+        # reject the alias; for those, fall back to a plain SELECT * (the
+        # first-column identity in _rowid_of).
+        try:
+            cur = conn.execute(f'SELECT *, rowid AS "{_ROWID_ALIAS}" FROM "{self.table}"')
+        except sqlite3.OperationalError:
+            cur = conn.execute(f'SELECT * FROM "{self.table}"')
+        return cur.fetchall()
+
     def _rowid_of(self, row: sqlite3.Row) -> Any:
         keys = row.keys()
         if "rowid" in keys:
             return row["rowid"]
+        if _ROWID_ALIAS in keys:
+            return row[_ROWID_ALIAS]
         # fall back to the first column value as the row identity
         return row[0]
 
@@ -81,14 +108,15 @@ class SQLiteAdapter(Adapter):
         conn = self._connect()
         present = self._columns()
         if not present:
-            return []
+            # every sqlite table has >= 1 column, so this means the table is
+            # missing or unreadable — never a legitimate "no residue" answer
+            raise ValueError(
+                f"sqlite store {self.store_id!r}: cannot read table "
+                f"{self.table!r} from {self.path!r} — does the table exist?"
+            )
         scan_cols = [c for c in self.text_columns if c in present] or present
         hits: list[ResidueHit] = []
-        try:
-            rows = conn.execute(f'SELECT * FROM "{self.table}"').fetchall()
-        except sqlite3.Error:
-            return []
-        for row in rows:
+        for row in self._select_rows(conn):
             rowid = self._rowid_of(row)
             for col in scan_cols:
                 if col not in row.keys():

@@ -23,6 +23,7 @@ class TraceTextAdapter(Adapter):
     """Reverse-locate a subject's PII residue across a glob of trace text files."""
 
     kind = "trace_text"
+    required_fields = ("glob",)
 
     def __init__(self, store_id: str, glob: str, **_: object) -> None:
         super().__init__(store_id)
@@ -30,6 +31,9 @@ class TraceTextAdapter(Adapter):
 
     def locate(self, subject_id: str) -> list[ResidueHit]:
         hits: list[ResidueHit] = []
+        needle = subject_id.encode("utf-8")
+        if not needle:
+            return hits
         for file_path in glob_module.glob(self.glob, recursive=True):
             if not os.path.isfile(file_path):
                 continue
@@ -38,26 +42,26 @@ class TraceTextAdapter(Adapter):
                     raw = fh.read()
             except OSError:
                 continue
-            text = raw.decode("utf-8", errors="replace")
+            # search the raw bytes so the reported offset is a true byte offset
+            # into the file (decoding with errors="replace" then re-encoding
+            # would skew offsets on non-UTF-8 content)
             search_from = 0
             while True:
-                idx = text.find(subject_id, search_from)
+                idx = raw.find(needle, search_from)
                 if idx == -1:
                     break
-                # byte offset of the match (text[:idx] -> utf-8 bytes length)
-                byte_offset = len(text[:idx].encode("utf-8", errors="replace"))
                 ctx_start = max(0, idx - _EVIDENCE_CONTEXT)
-                ctx_end = min(len(text), idx + len(subject_id) + _EVIDENCE_CONTEXT)
-                evidence = text[ctx_start:ctx_end].encode("utf-8", errors="replace")
+                ctx_end = min(len(raw), idx + len(needle) + _EVIDENCE_CONTEXT)
+                evidence = raw[ctx_start:ctx_end]
                 hits.append(
                     ResidueHit(
                         store_id=self.store_id,
                         adapter=AdapterKind.trace_text,
-                        locator=f"{file_path}:offset={byte_offset}",
+                        locator=f"{file_path}:offset={idx}",
                         residue_kind="trace_ref",
                         confidence=1.0,
                         evidence_hash=sha256_hex(evidence),
                     )
                 )
-                search_from = idx + max(1, len(subject_id))
+                search_from = idx + len(needle)
         return hits

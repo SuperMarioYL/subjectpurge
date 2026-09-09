@@ -95,7 +95,7 @@ def audit(
 ) -> None:
     """m3: ed25519 signed 等保2.0 audit proof (not in this m1 build)."""
     try:
-        audit_mod.audit(subject)
+        audit_mod.audit(subject, residue=residue, lineage=lineage, out=out)
     except NotImplementedError as exc:
         _not_in_build("audit", exc)
 

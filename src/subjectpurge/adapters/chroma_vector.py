@@ -14,6 +14,8 @@ trace adapters work without it.
 
 from __future__ import annotations
 
+import os
+
 from subjectpurge.adapters.base import Adapter
 from subjectpurge.models import AdapterKind, ResidueHit, sha256_hex
 
@@ -26,6 +28,7 @@ class ChromaAdapter(Adapter):
     """Reverse-locate a subject's PII residue in a persisted Chroma collection."""
 
     kind = "chroma"
+    required_fields = ("path",)
 
     def __init__(
         self,
@@ -39,6 +42,12 @@ class ChromaAdapter(Adapter):
         self.collection_name = collection
 
     def _client(self):  # type: ignore[no-untyped-def]
+        # Fail loudly on a typo'd path: PersistentClient would silently create
+        # the directory and the scan would report a false-clean 0-hit store.
+        if not os.path.isdir(self.path):
+            raise FileNotFoundError(
+                f"chroma store {self.store_id!r}: no directory at {self.path!r}"
+            )
         try:
             import chromadb  # noqa: PLC0415 — lazy, optional extra
         except ImportError as exc:  # pragma: no cover - exercised by skip guard

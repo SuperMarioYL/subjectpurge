@@ -35,6 +35,14 @@ def build_adapter(store: StoreConfig) -> Adapter:
             f"no adapter registered for store kind {store.kind!r} (store id={store.id!r}). "
             "The graph-store adapter is an enterprise extension and is not in v0.1."
         )
+    missing = [field for field in cls.required_fields if not getattr(store, field, None)]
+    if missing:
+        # a malformed stores.yaml entry must fail with the store id + field
+        # name, not a raw TypeError from the adapter constructor
+        raise ValueError(
+            f"store {store.id!r} (kind={store.kind!r}) is missing required "
+            f"field(s): {', '.join(missing)}"
+        )
     fields = store.model_dump(exclude={"id", "kind"})
     fields = {k: v for k, v in fields.items() if v is not None}
     return cls(store_id=store.id, **fields)
