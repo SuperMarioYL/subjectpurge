@@ -163,6 +163,17 @@ def test_cli_version():
     assert __version__ in result.stdout
 
 
+def test_version_surfaces_lockstep():
+    """pyproject (the installed distribution), __init__ and web/site.json move
+    in lockstep — a bump must update all of them or CI fails."""
+    from importlib.metadata import version as dist_version
+
+    repo_root = Path(__file__).resolve().parent.parent
+    site = json.loads((repo_root / "web" / "site.json").read_text(encoding="utf-8"))
+    assert dist_version("subjectpurge") == __version__ == "0.3.0"
+    assert site["meta"]["content_version"] == f"v{__version__}"
+
+
 def test_cli_scan_command(three_store_fixture):
     fx = three_store_fixture
     result = runner.invoke(

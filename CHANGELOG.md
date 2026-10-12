@@ -4,6 +4,22 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [SemVer](https://semver.org/).
 
+## [0.3.0] — 2026-10-13
+
+### Fixed
+
+- **release: the GitHub Release now carries the built wheel/sdist.** The
+  release workflow stored `dist/` as a CI artifact only, so the v0.2.0 release
+  shipped with zero downloadable assets even though its release run completed
+  green. A `publish` job now attaches the wheel, sdist and checksums to every
+  tag's GitHub Release.
+- **cli: `scan` errors print one named error line and exit 1.** A missing or
+  malformed `stores.yaml`, a schema-invalid entry, a missing store file, a
+  corrupt database or a path that is not a database previously escaped as a
+  full Python traceback (and the not-a-database case named no store at all).
+  The fail-loud behaviour is unchanged — non-zero exit, cause named — only the
+  traceback presentation is gone.
+
 ## [0.2.0] — 2026-09-09
 
 ### Fixed
