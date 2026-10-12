@@ -28,6 +28,28 @@ jobs:
           name: dist
           path: dist/
 
+  # Attach the built wheel/sdist to the GitHub Release. upload-artifact only
+  # stores a CI artifact — without this job the v0.2.0 release shipped with
+  # zero downloadable assets even though its release run completed green.
+  publish:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Attach dist to the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 \
+            || gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --generate-notes
+          gh release upload "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" --clobber
+
   # Opt-in PyPI trusted publishing. A fresh repo has no Trusted Publisher
   # registered, so this job is skipped until the repo sets PYPI_PUBLISH=true
   # and configures the Trusted Publisher (document the one-time step in

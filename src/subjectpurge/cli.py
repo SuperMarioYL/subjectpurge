@@ -9,9 +9,11 @@ build" message + exit non-zero so automation cannot mistake them for success.
 from __future__ import annotations
 
 import json
+import sqlite3
 from pathlib import Path
 
 import typer
+import yaml
 
 from subjectpurge import __version__
 from subjectpurge import audit as audit_mod
@@ -53,7 +55,14 @@ def scan(
     out: str = typer.Option("residue_map.json", "--out", "-o", help="output residue map path"),
 ) -> None:
     """Locate every PII residue of <subject> across the registered stores."""
-    residue = scan_fn(subject, config, out)
+    try:
+        residue = scan_fn(subject, config, out)
+    except (OSError, ValueError, sqlite3.Error, yaml.YAMLError) as exc:
+        # operator-facing surface: one named error line, exit 1 — a raw
+        # traceback buries the named cause (store id / field / path) a
+        # 合规/SRE operator needs, and is not automation-parseable
+        typer.echo(f"error: {exc}", err=True)
+        raise typer.Exit(code=1) from exc
     typer.echo(
         f"scanned subject={residue.subject_id} across "
         f"{len(residue.by_store())} store(s), operator={residue.operator}"

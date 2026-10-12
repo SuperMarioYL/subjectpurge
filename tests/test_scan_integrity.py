@@ -205,14 +205,76 @@ def test_missing_chroma_dir_raises_and_creates_no_stray_dir(tmp_path):
 
 
 def test_cli_scan_missing_store_file_fails_loud(tmp_path):
-    """The CLI surfaces the loud failure as a non-zero exit, not a 0-hit map."""
+    """The CLI surfaces the loud failure as a one-line error + exit 1, not a
+    0-hit map and not a raw Python traceback."""
     stores_yaml = _write_stores_yaml(
         tmp_path / "stores.yaml",
         [{"id": "claude_mem", "kind": "sqlite", "path": str(tmp_path / "typo.db")}],
     )
     result = runner.invoke(app, ["scan", "--subject", SUBJECT, "--config", str(stores_yaml)])
-    assert result.exit_code != 0
-    assert isinstance(result.exception, FileNotFoundError)
+    assert result.exit_code == 1
+    assert result.stderr.startswith("error:")
+    assert "claude_mem" in result.stderr
+    assert "Traceback" not in result.output
+    # no residue map was written for the failed scan
+    assert not (tmp_path / "residue_map.json").exists()
+
+
+def test_cli_scan_missing_config_file_one_line_error(tmp_path):
+    """A missing stores.yaml exits 1 naming the path — no traceback."""
+    result = runner.invoke(
+        app, ["scan", "--subject", SUBJECT, "--config", str(tmp_path / "nope.yaml")]
+    )
+    assert result.exit_code == 1
+    assert result.stderr.startswith("error:")
+    assert "nope.yaml" in result.stderr
+    assert "Traceback" not in result.output
+
+
+def test_cli_scan_malformed_yaml_one_line_error(tmp_path):
+    stores_yaml = tmp_path / "stores.yaml"
+    stores_yaml.write_text("operator: [unclosed\n", encoding="utf-8")
+    result = runner.invoke(app, ["scan", "--subject", SUBJECT, "--config", str(stores_yaml)])
+    assert result.exit_code == 1
+    assert result.stderr.startswith("error:")
+    assert "Traceback" not in result.output
+
+
+def test_cli_scan_schema_invalid_stores_one_line_error(tmp_path):
+    """A schema violation (stores not a list) exits 1 with the validation error."""
+    stores_yaml = tmp_path / "stores.yaml"
+    stores_yaml.write_text("operator: alice\nstores: 5\n", encoding="utf-8")
+    result = runner.invoke(app, ["scan", "--subject", SUBJECT, "--config", str(stores_yaml)])
+    assert result.exit_code == 1
+    assert result.stderr.startswith("error:")
+    assert "validation error" in result.stderr
+    assert "Traceback" not in result.output
+
+
+def test_cli_scan_corrupt_sqlite_one_line_error_names_store(tmp_path):
+    """A file that is not a database exits 1 naming the store — no traceback."""
+    db = tmp_path / "corrupt.db"
+    db.write_bytes(b"not a sqlite database" * 4)
+    stores_yaml = _write_stores_yaml(
+        tmp_path / "stores.yaml", [{"id": "claude_mem", "kind": "sqlite", "path": str(db)}]
+    )
+    result = runner.invoke(app, ["scan", "--subject", SUBJECT, "--config", str(stores_yaml)])
+    assert result.exit_code == 1
+    assert result.stderr.startswith("error:")
+    assert "claude_mem" in result.stderr
+    assert "Traceback" not in result.output
+
+
+def test_cli_scan_directory_as_db_path_one_line_error(tmp_path):
+    """A path that is a directory (sqlite3.OperationalError, which names no
+    store itself) still exits 1 with the cause, not a raw traceback."""
+    stores_yaml = _write_stores_yaml(
+        tmp_path / "stores.yaml", [{"id": "claude_mem", "kind": "sqlite", "path": str(tmp_path)}]
+    )
+    result = runner.invoke(app, ["scan", "--subject", SUBJECT, "--config", str(stores_yaml)])
+    assert result.exit_code == 1
+    assert result.stderr.startswith("error:")
+    assert "Traceback" not in result.output
 
 
 # --------------------------------------------------------------------------- #
