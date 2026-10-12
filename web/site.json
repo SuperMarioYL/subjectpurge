@@ -83,8 +83,8 @@
       "zh": "本地上手"
     },
     "body": {
-      "en": "Create temporary SQLite and trace inputs containing demo@example.com, locate matches, and confirm the database still has both original rows.",
-      "zh": "创建含 demo@example.com 的临时 SQLite 与轨迹输入，定位匹配，并确认数据库仍保留两条原始记录。"
+      "en": "Create temporary SQLite and trace inputs containing demo@example.com, locate matches, and confirm the database still has both original rows. Since v0.3.0 the built wheel and sdist are attached to the GitHub Releases page.",
+      "zh": "创建含 demo@example.com 的临时 SQLite 与轨迹输入，定位匹配，并确认数据库仍保留两条原始记录。自 v0.3.0 起，构建产物 wheel 与 sdist 附件发布在 GitHub Releases 页面。"
     },
     "steps": [
       {
