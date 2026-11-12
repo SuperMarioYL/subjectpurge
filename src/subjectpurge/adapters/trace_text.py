@@ -11,12 +11,28 @@ from __future__ import annotations
 
 import glob as glob_module
 import os
+import re
 
 from subjectpurge.adapters.base import Adapter
 from subjectpurge.models import AdapterKind, ResidueHit, sha256_hex
 
 # bytes of context captured around each match for the evidence hash
 _EVIDENCE_CONTEXT = 48
+
+# First glob metacharacter — everything before it is a literal path.
+_GLOB_MAGIC = re.compile(r"[*?\[]")
+
+
+def _static_root(pattern: str) -> str | None:
+    """Deepest literal path before the first glob metacharacter.
+
+    Used to tell a misregistered path (root missing -> fail loud) from a
+    legitimately empty store (root exists, no matching files -> 0 hits).
+    """
+    match = _GLOB_MAGIC.search(pattern)
+    if match is None:
+        return pattern  # exact path — it must exist
+    return os.path.dirname(pattern[: match.start()]) or None
 
 
 class TraceTextAdapter(Adapter):
@@ -34,14 +50,27 @@ class TraceTextAdapter(Adapter):
         needle = subject_id.encode("utf-8")
         if not needle:
             return hits
-        for file_path in glob_module.glob(self.glob, recursive=True):
+        pattern = os.path.expanduser(self.glob)
+        root = _static_root(pattern)
+        if root is not None and not os.path.exists(root):
+            # Fail loudly on a typo'd path: an empty match would otherwise read
+            # as a false-clean 0-hit store (same rule as the sqlite/chroma
+            # adapters). A root that exists with no files stays a clean store.
+            raise FileNotFoundError(
+                f"trace store {self.store_id!r}: no path at {root!r} (glob {self.glob!r})"
+            )
+        for file_path in glob_module.glob(pattern, recursive=True):
             if not os.path.isfile(file_path):
                 continue
             try:
                 with open(file_path, "rb") as fh:
                     raw = fh.read()
-            except OSError:
-                continue
+            except OSError as exc:
+                # A matched file we cannot read is evidence we failed to
+                # examine — it must never be silently skipped.
+                raise OSError(
+                    f"trace store {self.store_id!r}: cannot read {file_path!r}: {exc}"
+                ) from exc
             # search the raw bytes so the reported offset is a true byte offset
             # into the file (decoding with errors="replace" then re-encoding
             # would skew offsets on non-UTF-8 content)

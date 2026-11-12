@@ -4,6 +4,42 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [SemVer](https://semver.org/).
 
+## [0.4.0] — 2026-11-12
+
+### Fixed
+
+- **scan: a broken Chroma backend no longer reads as a clean store.** The
+  adapter caught every exception from `get_collection` and returned no hits, so
+  a corrupt or unreadable persisted store reported `total residue hits: 0` with
+  a zero exit code. The collection is now listed first (which surfaces backend
+  errors) and only a genuinely absent collection means "no residue"; any other
+  read failure raises a `ValueError` naming the store and path.
+- **scan: a misregistered trace path fails loud.** A trace glob whose literal
+  path prefix does not exist now raises `FileNotFoundError` naming the store
+  instead of reporting a false-clean 0-hit store — the same rule the SQLite and
+  Chroma adapters already followed. A directory that exists with no matching
+  files remains a legitimately clean store. `~` in a trace glob is expanded.
+- **scan: an unreadable trace file fails loud.** A matched file that cannot be
+  opened is now an `OSError` naming the store and file instead of being silently
+  skipped, so the map never claims to have examined bytes it could not read.
+- **scan: an unavailable Chroma extra prints one error line.** A missing
+  `chromadb` dependency is translated into the same named `ValueError` the CLI
+  already renders as `error: <cause>` with exit 1, instead of a raw traceback.
+- **scan: blank subjects and empty or duplicate registries are refused.** An
+  empty subject (contained in every value) previously matched every row; a
+  `stores: []` registry previously produced a "clean" scan of nothing; a
+  duplicated store id double-counted one residue under identical locators. All
+  three now fail with a named error.
+- **scan: duplicate `text_columns` no longer emit duplicate locators**, and the
+  CLI summary reports residue-bearing stores (`with residue in N store(s)`)
+  rather than printing `across 0 store(s)` after a successful clean scan.
+
+### Changed
+
+- Scans that previously "succeeded" with a blank subject, an empty registry or
+  duplicate store ids now exit non-zero. A wrong Chroma collection name still
+  returns 0 hits — an accepted residual, now documented in both READMEs.
+
 ## [0.3.0] — 2026-10-13
 
 ### Fixed

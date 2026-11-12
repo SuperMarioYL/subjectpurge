@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "subjectpurge"
-version = "0.3.0"
+version = "0.4.0"
 description = "Locate exact subject identifiers across configured SQLite, text-trace and optional Chroma stores and export a residue map."
 readme = "README.md"
 license = "MIT"

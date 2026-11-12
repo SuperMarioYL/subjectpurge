@@ -103,7 +103,7 @@ subjectpurge scan --subject demo@example.com --config stores.yaml --out residue_
 
 ## Configuration
 
-stores.yaml lists id, kind, path or glob and adapter settings. SQLite uses table and text_columns; Chroma uses collection and requires the optional chroma extra. graph is declared in the schema but no built-in adapter is registered. operator and law_ref are metadata, not compliance validation.
+stores.yaml lists id, kind, path or glob and adapter settings. SQLite uses table and text_columns; Chroma uses collection and requires the optional chroma extra. graph is declared in the schema but no built-in adapter is registered. operator and law_ref are metadata, not compliance validation. A missing path, a glob whose literal prefix does not exist, or an unreadable matched file makes the scan fail instead of producing a 0-hit result.
 
 ## Integrations and responsibilities
 
@@ -127,6 +127,7 @@ The following routes are implemented in the source. Choose the input that matche
 
 - purge, audit and verify are unimplemented milestones. The current release locates references but does not delete them or issue a signed audit proof.
 - Exact identifier matching can miss paraphrases or transformed identifiers. A scan cannot establish that every personal-data residue has been found.
+- A misspelled Chroma collection name still returns 0 hits because an absent collection is indistinguishable from an empty one — check the collection name in stores.yaml.
 - The demo only uses temporary SQLite and text files with a reserved example email. No live store is accessed.
 
 Per-hit deletion, chained lineage and signed audit output are future milestones requiring separate implementation and verification.

@@ -29,7 +29,7 @@ from pathlib import Path
 from typing import Literal
 
 import yaml
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 StoreKind = Literal["sqlite", "chroma", "trace_text", "graph"]
 
@@ -57,6 +57,19 @@ class SubjectPurgeConfig(BaseModel):
     operator: str = Field(default="operator", description="合规/SRE account on the on-prem box")
     law_ref: str = Field(default="PIPL-47", description="regulation the audit proof cites")
     stores: list[StoreConfig] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def _unique_store_ids(self) -> SubjectPurgeConfig:
+        """A store id keys the residue map and lineage, so it must be unique."""
+        seen: set[str] = set()
+        duplicates: list[str] = []
+        for store in self.stores:
+            if store.id in seen:
+                duplicates.append(store.id)
+            seen.add(store.id)
+        if duplicates:
+            raise ValueError(f"duplicate store id(s): {', '.join(sorted(set(duplicates)))}")
+        return self
 
     @classmethod
     def from_yaml(cls, path: str | Path) -> SubjectPurgeConfig:

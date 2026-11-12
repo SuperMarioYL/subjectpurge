@@ -114,7 +114,7 @@ class SQLiteAdapter(Adapter):
                 f"sqlite store {self.store_id!r}: cannot read table "
                 f"{self.table!r} from {self.path!r} — does the table exist?"
             )
-        scan_cols = [c for c in self.text_columns if c in present] or present
+        scan_cols = list(dict.fromkeys(c for c in self.text_columns if c in present)) or present
         hits: list[ResidueHit] = []
         for row in self._select_rows(conn):
             rowid = self._rowid_of(row)

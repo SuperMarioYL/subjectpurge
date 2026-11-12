@@ -64,7 +64,7 @@ def scan(
         typer.echo(f"error: {exc}", err=True)
         raise typer.Exit(code=1) from exc
     typer.echo(
-        f"scanned subject={residue.subject_id} across "
+        f"scanned subject={residue.subject_id} with residue in "
         f"{len(residue.by_store())} store(s), operator={residue.operator}"
     )
     _print_summary(subject, out)

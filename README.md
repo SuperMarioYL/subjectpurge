@@ -103,7 +103,7 @@ subjectpurge scan --subject demo@example.com --config stores.yaml --out residue_
 
 ## 配置
 
-stores.yaml 列出 id、kind、path 或 glob 与适配设置。SQLite 使用 table 和 text_columns；Chroma 使用 collection 并需要可选 chroma 依赖。schema 声明 graph，但未注册内置适配器。operator 与 law_ref 是元数据，不执行合规验证。
+stores.yaml 列出 id、kind、path 或 glob 与适配设置。SQLite 使用 table 和 text_columns；Chroma 使用 collection 并需要可选 chroma 依赖。schema 声明 graph，但未注册内置适配器。operator 与 law_ref 是元数据，不执行合规验证。缺失的 path、glob 字面前缀或无法读取的匹配文件会让扫描报错退出，而不是生成 0 命中结果。
 
 ## 集成与职责分工
 
@@ -127,6 +127,7 @@ stores.yaml 列出 id、kind、path 或 glob 与适配设置。SQLite 使用 tab
 
 - purge、audit 与 verify 尚未实现。当前版本定位引用，不删除数据，也不签发审计证明。
 - 精确标识匹配可能漏掉改写或变换后的标识；扫描不能证明已找到全部个人数据残留。
+- Chroma collection 名拼写错误时仍会返回 0 命中（不存在的集合与空集合无法区分），请核对 stores.yaml 中的 collection 名。
 - 示例只使用临时 SQLite、文本文件及保留示例邮箱，不访问在线存储。
 
 逐命中删除、链式溯源和签名审计输出属于后续里程碑，需要分别实现与验证。

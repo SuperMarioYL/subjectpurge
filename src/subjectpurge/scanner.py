@@ -55,6 +55,15 @@ class Scanner:
         self.config = config
 
     def locate(self, subject_id: str) -> ResidueMap:
+        # A blank subject is contained in every value (substring match), and an
+        # empty registry is a "clean" scan of nothing. Neither is a meaningful
+        # deletion answer, so refuse both instead of emitting a misleading map.
+        if not (subject_id or "").strip():
+            raise ValueError("subject id must be a non-empty string")
+        if not self.config.stores:
+            raise ValueError(
+                "no stores registered in the config — refusing to report a clean scan of nothing"
+            )
         hits: list[ResidueHit] = []
         for store in self.config.stores:
             adapter = build_adapter(store)

@@ -50,21 +50,31 @@ class ChromaAdapter(Adapter):
             )
         try:
             import chromadb  # noqa: PLC0415 — lazy, optional extra
-        except ImportError as exc:  # pragma: no cover - exercised by skip guard
-            raise ImportError(
-                "Chroma support requires the optional 'chroma' extra: "
-                "pip install subjectpurge[chroma]"
+        except ImportError as exc:  # exercised by the missing-extra test
+            raise ValueError(
+                f"chroma store {self.store_id!r}: Chroma support requires the "
+                "optional 'chroma' extra (pip install subjectpurge[chroma])"
             ) from exc
         return chromadb.PersistentClient(path=self.path)
 
     def locate(self, subject_id: str) -> list[ResidueHit]:
         client = self._client()
         try:
+            # list first: a broken backend must fail here, not read as "clean".
+            # Only a genuinely absent collection means "no residue in this store".
+            present = {getattr(c, "name", c) for c in client.list_collections()}
+            if self.collection_name not in present:
+                return []
             collection = client.get_collection(self.collection_name)
-        except Exception:
-            # collection not present in this store -> no residue here
-            return []
-        res = collection.get()  # full scan (m1 fixture is small; large stores paginate at m2)
+            res = collection.get()
+        except Exception as exc:
+            # A backend failure is a false "store is clean" if swallowed — the
+            # worst failure mode for a deletion-request tool. Name the store and
+            # let the CLI render it as one error line.
+            raise ValueError(
+                f"chroma store {self.store_id!r}: cannot read collection "
+                f"{self.collection_name!r} at {self.path!r}: {exc}"
+            ) from exc
         ids: list[str] = res.get("ids", []) or []
         docs: list[str | None] = res.get("documents", []) or []
         metas: list[dict] = res.get("metadatas", []) or []
